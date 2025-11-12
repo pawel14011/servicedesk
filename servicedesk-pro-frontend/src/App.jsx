@@ -13,6 +13,7 @@ import { ManagerTicketsPage } from './pages/ManagerTicketsPage';
 import { AddDevicePage } from './pages/AddDevicePage';
 import { CreateTicketByWorkerPage } from './pages/CreateTicketByWorkerPage';
 import { DashboardReportsPage } from './pages/DashboardReportsPage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
 import './App.css';
 
 function App() {
@@ -59,6 +60,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TicketsListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute requiredRole="manager">
+              <AdminUsersPage />
             </ProtectedRoute>
           }
         />

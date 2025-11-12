@@ -1,4 +1,5 @@
-import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
+
+import { collection, getDocs, query, where, doc, getDoc, setDoc,updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 // Pobierz wszystkich użytkowników
@@ -70,6 +71,67 @@ export const createUserProfile = async (userData) => {
     return userId;
   } catch (error) {
     console.error('Error creating user profile:', error);
+    throw error;
+  }
+};
+
+
+// Zaktualizuj użytkownika
+export const updateUser = async (userId, updateData) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, updateData);
+    console.log('✅ User updated:', userId);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
+// Usuń użytkownika
+export const deleteUser = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await deleteDoc(userRef);
+    console.log('✅ User deleted:', userId);
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
+
+// Zmień rolę użytkownika
+export const changeUserRole = async (userId, newRole) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { role: newRole });
+    console.log(`✅ User ${userId} role changed to ${newRole}`);
+  } catch (error) {
+    console.error('Error changing user role:', error);
+    throw error;
+  }
+};
+
+// Deaktywuj użytkownika
+export const deactivateUser = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { active: false });
+    console.log('✅ User deactivated:', userId);
+  } catch (error) {
+    console.error('Error deactivating user:', error);
+    throw error;
+  }
+};
+
+// Aktywuj użytkownika
+export const activateUser = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { active: true });
+    console.log('✅ User activated:', userId);
+  } catch (error) {
+    console.error('Error activating user:', error);
     throw error;
   }
 };

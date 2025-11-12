@@ -1,0 +1,289 @@
+.admin-users-container {
+  padding: 30px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.btn-add-user {
+  background: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-add-user:hover {
+  background: #5568d3;
+}
+
+/* Formularz nowego użytkownika */
+.new-user-form {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.form-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.form-card h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-save {
+  flex: 1;
+  background: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-save:hover {
+  background: #45a049;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: #f44336;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-cancel:hover {
+  background: #da190b;
+}
+
+/* Filtry */
+.admin-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-filters button {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.admin-filters button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Tabela */
+.users-table-container {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.users-table thead {
+  background: #667eea;
+  color: white;
+}
+
+.users-table th,
+.users-table td {
+  padding: 15px;
+  text-align: left;
+}
+
+.users-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.users-table tr:hover {
+  background: #f0f0f0;
+}
+
+.users-table tr.inactive {
+  opacity: 0.6;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Inline editing */
+.inline-input,
+.inline-select {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #667eea;
+  border-radius: 3px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.btn-save-inline,
+.btn-cancel-inline {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 0 2px;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.btn-save-inline {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-save-inline:hover {
+  background: #45a049;
+}
+
+.btn-cancel-inline {
+  background: #f44336;
+  color: white;
+}
+
+.btn-cancel-inline:hover {
+  background: #da190b;
+}
+
+/* Akcje */
+.actions-group {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-edit,
+.btn-toggle,
+.btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px;
+  transition: transform 0.2s;
+}
+
+.btn-edit:hover,
+.btn-toggle:hover,
+.btn-delete:hover {
+  transform: scale(1.2);
+}
+
+.btn-edit {
+  color: #667eea;
+}
+
+.btn-toggle {
+  color: #ff9800;
+}
+
+.btn-delete {
+  color: #f44336;
+}
