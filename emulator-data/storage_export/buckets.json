@@ -2,6 +2,9 @@
   "buckets": [
     {
       "id": "demo-servicedesk-pro.appspot.com"
+    },
+    {
+      "id": "demo-project.appspot.com"
     }
   ]
 }

@@ -1,0 +1,161 @@
+.device-detail-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.btn-back {
+  background: #667eea;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-back:hover {
+  background: #5568d3;
+}
+
+.device-detail-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.device-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 20px;
+}
+
+.device-header h2 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 28px;
+}
+
+.warranty-info {
+  text-align: right;
+  color: #666;
+  font-size: 14px;
+}
+
+.device-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.device-section {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.device-section h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.info-grid div {
+  background: white;
+  padding: 12px;
+  border-radius: 5px;
+}
+
+.info-grid strong {
+  color: #667eea;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.repairs-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.repair-item {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #667eea;
+}
+
+.repair-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.repair-number {
+  font-weight: bold;
+  color: #333;
+  min-width: 120px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.repair-date {
+  color: #999;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+.repair-description {
+  color: #666;
+  margin: 0 0 10px 0;
+  font-size: 14px;
+}
+
+.btn-view-ticket {
+  background: #667eea;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s;
+}
+
+.btn-view-ticket:hover {
+  background: #5568d3;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+}

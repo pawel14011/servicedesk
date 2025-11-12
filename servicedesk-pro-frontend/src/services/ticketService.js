@@ -318,3 +318,195 @@ export const updatePartStatus = async (ticketId, partId, newStatus) => {
     throw error;
   }
 };
+
+// Zmień przypisanie ticket'u (Manager)
+export const reassignTicket = async (ticketId, newTechnicianId, managerId) => {
+  try {
+    const ticketRef = doc(db, 'tickets', ticketId);
+    const ticketSnap = await getDoc(ticketRef);
+
+    const reassignmentHistory = ticketSnap.data().reassignmentHistory || [];
+
+    await updateDoc(ticketRef, {
+      technicianId: newTechnicianId,
+      reassignmentHistory: [
+        ...reassignmentHistory,
+        {
+          oldTechnicianId: ticketSnap.data().technicianId,
+          newTechnicianId: newTechnicianId,
+          reassignedBy: managerId,
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+
+    console.log(`✅ Ticket ${ticketId} reassigned to ${newTechnicianId}`);
+  } catch (error) {
+    console.error('Error reassigning ticket:', error);
+    throw error;
+  }
+};
+
+// Pobierz statystyki technika (ilość otwartych ticketów)
+export const getTechnicianStats = async (technicianId) => {
+  try {
+    const q = query(
+      collection(db, 'tickets'),
+      where('technicianId', '==', technicianId),
+      where('status', '!=', 'Closed')
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.length;
+  } catch (error) {
+    console.error('Error fetching technician stats:', error);
+    throw error;
+  }
+};
+
+// Pobierz statystyki ticketów
+export const getTicketStats = async () => {
+  try {
+    const allTickets = await getDocs(collection(db, 'tickets'));
+    const tickets = allTickets.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const stats = {
+      total: tickets.length,
+      registered: tickets.filter((t) => t.status === 'Registered').length,
+      received: tickets.filter((t) => t.status === 'Received').length,
+      diagnosed: tickets.filter((t) => t.status === 'Diagnosed').length,
+      repairing: tickets.filter((t) => t.status === 'Repairing').length,
+      ready: tickets.filter((t) => t.status === 'Ready').length,
+      closed: tickets.filter((t) => t.status === 'Closed').length,
+      open: tickets.filter((t) => t.status !== 'Closed').length,
+    };
+
+    return { stats, tickets };
+  } catch (error) {
+    console.error('Error fetching ticket stats:', error);
+    throw error;
+  }
+};
+
+// Oblicz średni czas naprawy
+export const calculateAverageRepairTime = (tickets) => {
+  const closedTickets = tickets.filter((t) => t.status === 'Closed');
+
+  if (closedTickets.length === 0) return 0;
+
+  const totalTime = closedTickets.reduce((sum, ticket) => {
+    const created = new Date(ticket.createdAt);
+    const statusHistory = ticket.statusHistory || [];
+    const closed = statusHistory.find((s) => s.status === 'Closed');
+
+    if (closed) {
+      const closedDate = new Date(closed.timestamp);
+      return sum + (closedDate - created);
+    }
+    return sum;
+  }, 0);
+
+  const averageMs = totalTime / closedTickets.length;
+  const averageDays = averageMs / (1000 * 60 * 60 * 24);
+
+  return parseFloat(averageDays.toFixed(2));
+};
+
+// Pobierz statystyki części
+export const getPartsStatistics = async () => {
+  try {
+    const allTickets = await getDocs(collection(db, 'tickets'));
+    const partsCount = {};
+
+    allTickets.docs.forEach((doc) => {
+      const parts = doc.data().ticketParts || [];
+      parts.forEach((part) => {
+        const key = `${part.description} (${part.manufacturer})`;
+        partsCount[key] = (partsCount[key] || 0) + 1;
+      });
+    });
+
+    // Sortuj malejąco
+    const sorted = Object.entries(partsCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10); // Top 10
+
+    return sorted;
+  } catch (error) {
+    console.error('Error fetching parts statistics:', error);
+    throw error;
+  }
+};
+
+// Statystyki per technik
+export const getTechnicianPerformance = async () => {
+  try {
+    const allTickets = await getDocs(collection(db, 'tickets'));
+    const techStats = {};
+
+    allTickets.docs.forEach((doc) => {
+      const ticket = doc.data();
+      const techId = ticket.technicianId;
+
+      if (!techStats[techId]) {
+        techStats[techId] = {
+          total: 0,
+          closed: 0,
+          open: 0,
+        };
+      }
+
+      techStats[techId].total++;
+      if (ticket.status === 'Closed') {
+        techStats[techId].closed++;
+      } else {
+        techStats[techId].open++;
+      }
+    });
+
+    return techStats;
+  } catch (error) {
+    console.error('Error fetching technician performance:', error);
+    throw error;
+  }
+};
+
+// Dodaj zdjęcie do ticketu
+export const addImageToTicket = async (ticketId, imageData) => {
+  try {
+    const ticketRef = doc(db, 'tickets', ticketId);
+    const ticketSnap = await getDoc(ticketRef);
+    const images = ticketSnap.data().images || [];
+
+    await updateDoc(ticketRef, {
+      images: [...images, imageData],
+    });
+
+    console.log('✅ Image added to ticket');
+  } catch (error) {
+    console.error('Error adding image to ticket:', error);
+    throw error;
+  }
+};
+
+// Usuń zdjęcie z ticketu
+export const removeImageFromTicket = async (ticketId, imagePath) => {
+  try {
+    const ticketRef = doc(db, 'tickets', ticketId);
+    const ticketSnap = await getDoc(ticketRef);
+    const images = ticketSnap.data().images || [];
+
+    const updatedImages = images.filter((img) => img.path !== imagePath);
+
+    await updateDoc(ticketRef, {
+      images: updatedImages,
+    });
+
+    console.log('✅ Image removed from ticket');
+  } catch (error) {
+    console.error('Error removing image from ticket:', error);
+    throw error;
+  }
+};

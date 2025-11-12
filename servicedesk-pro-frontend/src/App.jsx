@@ -7,6 +7,12 @@ import { DashboardPage } from './pages/DashboardPage';
 import { CreateTicketPage } from './pages/CreateTicketPage';
 import { TicketsListPage } from './pages/TicketsListPage';
 import { TicketDetailPage } from './pages/TicketDetailPage';
+import { DevicesListPage } from './pages/DevicesListPage';
+import { DeviceDetailPage } from './pages/DeviceDetailPage';
+import { ManagerTicketsPage } from './pages/ManagerTicketsPage';
+import { AddDevicePage } from './pages/AddDevicePage';
+import { CreateTicketByWorkerPage } from './pages/CreateTicketByWorkerPage';
+import { DashboardReportsPage } from './pages/DashboardReportsPage';
 import './App.css';
 
 function App() {
@@ -62,6 +68,58 @@ function App() {
           element={
             <ProtectedRoute>
               <TicketDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/devices"
+          element={
+            <ProtectedRoute>
+              <DevicesListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute requiredRole="manager">
+              <DashboardReportsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/create-ticket-worker"
+          element={
+            <ProtectedRoute requiredRole="worker">
+              <CreateTicketByWorkerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/device/:deviceId"
+          element={
+            <ProtectedRoute>
+              <DeviceDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/manager-tickets"
+          element={
+            <ProtectedRoute requiredRole="manager">
+              <ManagerTicketsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/add-device"
+          element={
+            <ProtectedRoute requiredRole="client">
+              <AddDevicePage />
             </ProtectedRoute>
           }
         />

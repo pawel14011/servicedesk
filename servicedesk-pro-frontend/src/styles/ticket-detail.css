@@ -429,3 +429,18 @@
   margin: 0;
   white-space: pre-wrap;
 }
+.btn-download-pdf {
+  background: #4caf50;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: background 0.3s;
+}
+
+.btn-download-pdf:hover {
+  background: #45a049;
+}

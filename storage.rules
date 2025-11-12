@@ -1,10 +1,47 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    
+    // Helper function - sprawdzenie czy użytkownik jest zalogowany
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function - pobierz rolę użytkownika z Firestore
+    function getUserRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // ============= TICKETS IMAGES =============
+    match /tickets/{ticketId}/{allPaths=**} {
+      
+      // Każdy zalogowany może czytać zdjęcia ticketów
+      allow read: if isAuthenticated();
+      
+      // Technician może uploadować zdjęcia do swoich ticketów
+      allow write: if isAuthenticated() && 
+                      (getUserRole() == 'technician' || 
+                       getUserRole() == 'worker' || 
+                       getUserRole() == 'manager');
+      
+      // Manager może wszystko
+      allow read, write: if isAuthenticated() && getUserRole() == 'manager';
+    }
+
+    // ============= DEVICES IMAGES =============
+    match /devices/{deviceId}/{allPaths=**} {
+      
+      // Każdy zalogowany może czytać zdjęcia urządzeń
+      allow read: if isAuthenticated();
+      
+      // Worker i Manager mogą uploadować
+      allow write: if isAuthenticated() && 
+                      (getUserRole() == 'worker' || getUserRole() == 'manager');
+    }
+
+    // ============= CATCH ALL =============
+    // Zabroń dostępu do wszystkiego innego
     match /{allPaths=**} {
       allow read, write: if false;
     }

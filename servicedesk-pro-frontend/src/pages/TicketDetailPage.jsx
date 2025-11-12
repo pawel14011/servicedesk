@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { generateTicketPDF } from '../services/pdfService';
+import { getUserDetails } from '../services/userService';
+import { ImageUploader } from '../components/ImageUploader';
 import { useAuth } from '../context/AuthContext';
 import {
   getTicketDetails,
@@ -24,6 +27,8 @@ export const TicketDetailPage = () => {
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(false);
 
+  const [ticketImages, setTicketImages] = useState([]);
+
   const [newNote, setNewNote] = useState('');
   const [newPart, setNewPart] = useState({
     type: 'installed',
@@ -47,6 +52,9 @@ export const TicketDetailPage = () => {
       setTicket(ticketData);
       setNotes(notesData);
       setParts(partsData);
+
+      setTicketImages(ticketData.images || []);
+
       console.log('✅ All data loaded');
     } catch (err) {
       console.error('Error loading data:', err);
@@ -186,6 +194,22 @@ export const TicketDetailPage = () => {
 
       <div className="ticket-detail-card">
         <div className="ticket-header">
+          <button
+            onClick={async () => {
+              try {
+                const technicianData = ticket.technicianId
+                  ? await getUserDetails(ticket.technicianId)
+                  : null;
+                await generateTicketPDF(ticket, user, technicianData);
+                alert('✅ PDF pobrany!');
+              } catch (error) {
+                alert('❌ Błąd: ' + error.message);
+              }
+            }}
+            className="btn-download-pdf"
+          >
+            📥 Pobierz PDF
+          </button>
           <div>
             <h2>{ticket.ticketNumber}</h2>
             <span
@@ -453,6 +477,12 @@ export const TicketDetailPage = () => {
             ) : (
               <p style={{ color: '#999' }}>Brak notatek</p>
             )}
+          </section>
+
+          {/* Zdjęcia */}
+          <section className="ticket-section">
+            <h3>📸 Zdjęcia</h3>
+            <ImageUploader ticketId={ticketId} onImagesChange={setTicketImages} />
           </section>
         </div>
       </div>

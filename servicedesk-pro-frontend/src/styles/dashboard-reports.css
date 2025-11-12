@@ -1,0 +1,267 @@
+.dashboard-reports-container {
+  padding: 30px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.reports-header h1 {
+  color: #333;
+  margin: 0;
+  font-size: 32px;
+}
+
+.btn-refresh {
+  background: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-refresh:hover {
+  background: #5568d3;
+}
+
+/* ============= KPI CARDS ============= */
+.kpi-section {
+  margin-bottom: 50px;
+}
+
+.kpi-section h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.kpi-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-icon {
+  font-size: 40px;
+}
+
+.kpi-content {
+  flex: 1;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 5px;
+}
+
+.kpi-label {
+  color: #666;
+  font-size: 14px;
+}
+
+/* ============= STATUS BREAKDOWN ============= */
+.stats-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
+}
+
+.stats-section h2 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.status-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 15px;
+}
+
+.status-label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+.status-bar {
+  background: #eee;
+  border-radius: 5px;
+  height: 30px;
+  overflow: hidden;
+}
+
+.status-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  transition: width 0.3s;
+}
+
+/* ============= PERFORMANCE ============= */
+.performance-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
+}
+
+.performance-section h2 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.performance-table {
+  overflow-x: auto;
+}
+
+.performance-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.performance-table thead {
+  background: #667eea;
+  color: white;
+}
+
+.performance-table th,
+.performance-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.performance-table tr:hover {
+  background: #f9f9f9;
+}
+
+.progress-bar {
+  background: #eee;
+  border-radius: 5px;
+  height: 25px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  transition: width 0.3s;
+}
+
+/* ============= PARTS ============= */
+.parts-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.parts-section h2 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.parts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.part-stat {
+  display: grid;
+  grid-template-columns: 50px 1fr 100px;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 5px;
+  border-left: 4px solid #667eea;
+}
+
+.part-rank {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  text-align: center;
+}
+
+.part-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.count-value {
+  background: #667eea;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-row {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .part-stat {
+    grid-template-columns: 40px 1fr 80px;
+    font-size: 14px;
+  }
+}
