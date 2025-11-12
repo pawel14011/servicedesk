@@ -479,10 +479,44 @@ export const TicketDetailPage = () => {
             )}
           </section>
 
-          {/* Zdjęcia */}
+          {/* PO - wszyscy widzą, ale tylko technician może dodawać */}
           <section className="ticket-section">
             <h3>📸 Zdjęcia</h3>
-            <ImageUploader ticketId={ticketId} onImagesChange={setTicketImages} />
+            {isTechnician ? (
+              <ImageUploader
+                ticketId={ticketId}
+                initialImages={ticketImages}
+                onImagesChange={(updatedImages) => {
+                  setTicketImages(updatedImages);
+                }}
+              />
+            ) : (
+              <div className="image-viewer">
+                {ticketImages.length > 0 ? (
+                  <div className="gallery">
+                    <div className="gallery-grid">
+                      {ticketImages.map((image, idx) => (
+                        <div key={idx} className="gallery-item">
+                          <img src={image.url} alt={`Zdjęcie ${idx + 1}`} />
+                          <div className="gallery-overlay">
+                            <a
+                              href={image.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-view-full"
+                            >
+                              👁️ Pełny rozmiar
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ color: '#999' }}>Brak zdjęć</p>
+                )}
+              </div>
+            )}
           </section>
         </div>
       </div>

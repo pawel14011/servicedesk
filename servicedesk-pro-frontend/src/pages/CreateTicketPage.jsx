@@ -6,6 +6,7 @@ import {
   getTechnicianWithLeastLoad,
   assignTicketToTechnician,
 } from '../services/ticketService';
+import { uploadImage } from '../services/storageService';
 import '../styles/ticket-form.css';
 
 export const CreateTicketPage = () => {
@@ -13,6 +14,8 @@ export const CreateTicketPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const [formData, setFormData] = useState({
     description: '',
@@ -20,7 +23,6 @@ export const CreateTicketPage = () => {
     deviceModel: '',
     deviceSerialNumber: '',
     deviceYear: new Date().getFullYear(),
-    imageUrl: '',
     preferredDeliveryDate: '',
   });
 
@@ -32,13 +34,43 @@ export const CreateTicketPage = () => {
     }));
   };
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Walidacja
+    if (!file.type.startsWith('image/')) {
+      alert('Plik musi być obrazem');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Plik jest zbyt duży (max 5MB)');
+      return;
+    }
+
+    setSelectedImage(file);
+
+    // Preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Tworzymy ticket
+      // 1. Tworzymy ticket
       const ticketId = await createTicket({
         clientId: user.uid,
         description: formData.description,
@@ -49,10 +81,24 @@ export const CreateTicketPage = () => {
           year: parseInt(formData.deviceYear),
         },
         preferredDeliveryDate: formData.preferredDeliveryDate || null,
-        imageUrl: formData.imageUrl,
+        images: [], // Zainicjalizuj pustą tablicę
       });
 
-      // Automatycznie przypisujemy do technika z najmniejszym obciążeniem
+      // 2. Jeśli jest zdjęcie, upload
+      if (selectedImage) {
+        try {
+          const imageData = await uploadImage(selectedImage, ticketId);
+          // Dodaj zdjęcie do ticketu
+          const { addImageToTicket } = await import('../services/ticketService');
+          await addImageToTicket(ticketId, imageData);
+          console.log('✅ Image uploaded to ticket');
+        } catch (imgError) {
+          console.error('⚠️ Error uploading image:', imgError);
+          // Nie blokuj tworzenia ticketu jeśli upload się nie uda
+        }
+      }
+
+      // 3. Przypisz do technika
       const leastLoadedTech = await getTechnicianWithLeastLoad();
       if (leastLoadedTech) {
         await assignTicketToTechnician(ticketId, leastLoadedTech, user.uid);
@@ -135,6 +181,36 @@ export const CreateTicketPage = () => {
               max={new Date().getFullYear()}
             />
           </div>
+        </div>
+
+        {/* ============= NOWA SEKCJA: ZDJĘCIE ============= */}
+        <div className="form-section">
+          <h3>📸 Zdjęcie urządzenia (opcjonalnie)</h3>
+          <p style={{ color: '#666', fontSize: '14px', marginBottom: '10px' }}>
+            Dodaj zdjęcie uszkodzonego urządzenia
+          </p>
+
+          {!imagePreview ? (
+            <label className="upload-label-inline">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                style={{ display: 'none' }}
+              />
+              <span className="upload-button-inline">📷 Wybierz zdjęcie</span>
+            </label>
+          ) : (
+            <div className="image-preview-box">
+              <img src={imagePreview} alt="Preview" />
+              <button type="button" onClick={removeImage} className="btn-remove-image">
+                🗑️ Usuń zdjęcie
+              </button>
+            </div>
+          )}
+          <small style={{ color: '#999', display: 'block', marginTop: '5px' }}>
+            Maksymalny rozmiar: 5MB. Obsługiwane: JPG, PNG, GIF
+          </small>
         </div>
 
         <div className="form-section">

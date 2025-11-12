@@ -23,7 +23,8 @@ service firebase.storage {
       allow write: if isAuthenticated() && 
                       (getUserRole() == 'technician' || 
                        getUserRole() == 'worker' || 
-                       getUserRole() == 'manager');
+                       getUserRole() == 'manager' ||
+                       getUserRole() == 'client');
       
       // Manager może wszystko
       allow read, write: if isAuthenticated() && getUserRole() == 'manager';

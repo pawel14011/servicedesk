@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { uploadImage, deleteImage } from '../services/storageService';
 import { addImageToTicket, removeImageFromTicket } from '../services/ticketService';
 import '../styles/image-uploader.css';
 
-export const ImageUploader = ({ ticketId, onImagesChange }) => {
+export const ImageUploader = ({ ticketId, initialImages = [], onImagesChange }) => {
   const [uploading, setUploading] = useState(false);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState(initialImages);
   const [error, setError] = useState('');
+
+  // Załaduj zdjęcia z props przy pierwszym renderze
+  useEffect(() => {
+    setImages(initialImages);
+  }, [initialImages]);
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -23,11 +28,12 @@ export const ImageUploader = ({ ticketId, onImagesChange }) => {
       await addImageToTicket(ticketId, imageData);
 
       // 3. Dodaj do lokalnej listy
-      setImages([...images, imageData]);
+      const updatedImages = [...images, imageData];
+      setImages(updatedImages);
 
       // 4. Powiadom parent component
       if (onImagesChange) {
-        onImagesChange([...images, imageData]);
+        onImagesChange(updatedImages);
       }
 
       console.log('✅ Image processed successfully');
@@ -88,7 +94,7 @@ export const ImageUploader = ({ ticketId, onImagesChange }) => {
         </small>
       </div>
 
-      {images.length > 0 && (
+      {images.length > 0 ? (
         <div className="gallery">
           <h4>Galeria ({images.length})</h4>
           <div className="gallery-grid">
@@ -112,6 +118,8 @@ export const ImageUploader = ({ ticketId, onImagesChange }) => {
             ))}
           </div>
         </div>
+      ) : (
+        <p style={{ color: '#999', marginTop: '15px' }}>Brak zdjęć</p>
       )}
     </div>
   );

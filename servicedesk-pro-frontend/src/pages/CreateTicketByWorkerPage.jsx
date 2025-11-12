@@ -15,7 +15,8 @@ export const CreateTicketByWorkerPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   // Listy
   const [clients, setClients] = useState([]);
   const [technicians, setTechnicians] = useState([]);
@@ -142,6 +143,18 @@ export const CreateTicketByWorkerPage = () => {
         },
       });
 
+      if (selectedImage) {
+        try {
+          const { uploadImage } = await import('../services/storageService');
+          const { addImageToTicket } = await import('../services/ticketService');
+          const imageData = await uploadImage(selectedImage, ticketId);
+          await addImageToTicket(ticketId, imageData);
+          console.log('✅ Image uploaded to ticket');
+        } catch (imgError) {
+          console.error('⚠️ Error uploading image:', imgError);
+        }
+      }
+
       // 4. Przypisz do technika
       let assignedTechId = formData.technicianId;
       if (formData.technicianId === 'auto') {
@@ -161,6 +174,34 @@ export const CreateTicketByWorkerPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Plik musi być obrazem');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Plik jest zbyt duży (max 5MB)');
+      return;
+    }
+
+    setSelectedImage(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   const isNewClient = formData.clientId === 'new';
@@ -351,6 +392,33 @@ export const CreateTicketByWorkerPage = () => {
             required
             rows="5"
           />
+        </div>
+
+        {/* ============= ZDJĘCIE ============= */}
+        <div className="form-section">
+          <h3>📸 Zdjęcie urządzenia (opcjonalnie)</h3>
+
+          {!imagePreview ? (
+            <label className="upload-label-inline">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                style={{ display: 'none' }}
+              />
+              <span className="upload-button-inline">📷 Wybierz zdjęcie</span>
+            </label>
+          ) : (
+            <div className="image-preview-box">
+              <img src={imagePreview} alt="Preview" />
+              <button type="button" onClick={removeImage} className="btn-remove-image">
+                🗑️ Usuń zdjęcie
+              </button>
+            </div>
+          )}
+          <small style={{ color: '#999', display: 'block', marginTop: '5px' }}>
+            Maksymalny rozmiar: 5MB
+          </small>
         </div>
 
         {/* Przypisanie technika */}
