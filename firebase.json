@@ -1,0 +1,52 @@
+{
+	"firestore": {
+		"database": "(default)",
+		"location": "nam5",
+		"rules": "firestore.rules",
+		"indexes": "firestore.indexes.json"
+	},
+	"functions": [
+		{
+			"source": "functions",
+			"codebase": "default",
+			"disallowLegacyRuntimeConfig": true,
+			"ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log", "*.local"],
+			"predeploy": ["npm --prefix \"$RESOURCE_DIR\" run lint"]
+		}
+	],
+	"hosting": {
+		"public": "servicedesk-pro-frontend/dist",
+		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+		"rewrites": [
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		]
+	},
+	"storage": {
+		"rules": "storage.rules"
+	},
+	"emulators": {
+		"auth": {
+			"port": 9099
+		},
+		"functions": {
+			"port": 5001
+		},
+		"firestore": {
+			"port": 8080
+		},
+		"pubsub": {
+			"port": 8085
+		},
+		"storage": {
+			"port": 9199
+		},
+		"ui": {
+			"enabled": true,
+			"port": 4002
+		},
+		"singleProjectMode": true
+	}
+}
