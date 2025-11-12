@@ -1,7 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/dashboard.css';
-import { seedAllData } from '../scripts/seedFirestore';
 
 export const DashboardPage = () => {
   const { user, userRole, logout } = useAuth();
@@ -29,18 +28,15 @@ export const DashboardPage = () => {
         <h2>Witaj, {user?.email}!</h2>
         <p>
           Twoja rola: <strong>{userRole}</strong>
-          
         </p>
-           <button onClick={seedAllData} style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#4CAF50', color: 'white', cursor: 'pointer' }}>
-            🌱 Seed Data
-          </button>
 
         <div className="role-info">
           {userRole === 'client' && (
             <div>
               <h3>📋 Panel Klienta</h3>
               <p>Możesz zgłaszać awarie i śledzić ich status</p>
-              <button>Zgłoś nową awarie</button>
+              <button onClick={() => navigate('/create-ticket')}>Zgłoś nową awarię</button>
+              <button onClick={() => navigate('/my-tickets')}>Moje zgłoszenia</button>
             </div>
           )}
 
@@ -48,7 +44,8 @@ export const DashboardPage = () => {
             <div>
               <h3>👷 Panel Pracownika</h3>
               <p>Możesz rejestrować zgłoszenia i urządzenia</p>
-              <button>Nowe zgłoszenie</button>
+              <button onClick={() => navigate('/create-ticket')}>Nowe zgłoszenie</button>
+              <button onClick={() => navigate('/my-tickets')}>Wszystkie zgłoszenia</button>
             </div>
           )}
 
@@ -56,7 +53,7 @@ export const DashboardPage = () => {
             <div>
               <h3>🔧 Panel Technika</h3>
               <p>Możesz przeglądać i naprawiać przypisane urządzenia</p>
-              <button>Moje zgłoszenia</button>
+              <button onClick={() => navigate('/my-tickets')}>Moje zgłoszenia</button>
             </div>
           )}
 
@@ -64,8 +61,9 @@ export const DashboardPage = () => {
             <div>
               <h3>📊 Panel Menedżera</h3>
               <p>Masz dostęp do wszystkich funkcji i raportów</p>
-              <button>Raporty</button>
-              <button>Użytkownicy</button>
+              <button onClick={() => navigate('/my-tickets')}>Wszystkie zgłoszenia</button>
+              <button onClick={() => navigate('/reports')}>Raporty</button>
+              <button onClick={() => navigate('/users')}>Użytkownicy</button>
             </div>
           )}
         </div>

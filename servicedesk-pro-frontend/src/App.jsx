@@ -4,6 +4,9 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { CreateTicketPage } from './pages/CreateTicketPage';
+import { TicketsListPage } from './pages/TicketsListPage';
+import { TicketDetailPage } from './pages/TicketDetailPage';
 import './App.css';
 
 function App() {
@@ -32,6 +35,33 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/create-ticket"
+          element={
+            <ProtectedRoute requiredRole="client">
+              <CreateTicketPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-tickets"
+          element={
+            <ProtectedRoute>
+              <TicketsListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ticket/:ticketId"
+          element={
+            <ProtectedRoute>
+              <TicketDetailPage />
             </ProtectedRoute>
           }
         />
