@@ -8,7 +8,9 @@ import {
   getTechnicianPerformance,
 } from '../services/ticketService';
 import { getUsersByRole } from '../services/userService';
+import { Navbar } from '../components/Navbar';
 import '../styles/dashboard-reports.css';
+import '../styles/dashboard.css';
 
 export const DashboardReportsPage = () => {
   const { userRole } = useAuth();
@@ -68,16 +70,32 @@ export const DashboardReportsPage = () => {
   };
 
   if (loading) {
-    return <div className="dashboard-reports-container">Ładowanie raportów...</div>;
+    return (
+      <div className="dashboard">
+        <Navbar />
+        <div className="dashboard-reports-container" style={{ padding: '20px' }}>
+          Ładowanie raportów...
+        </div>
+      </div>
+    );
   }
 
   if (!stats) {
-    return <div className="dashboard-reports-container">Błąd ładowania danych</div>;
+    return (
+      <div className="dashboard">
+        <Navbar />
+        <div className="dashboard-reports-container" style={{ padding: '20px' }}>
+          Błąd ładowania danych
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="dashboard-reports-container">
-      <div className="reports-header">
+    <div className="dashboard">
+      <Navbar />
+      <div className="dashboard-reports-container" style={{ padding: '20px' }}>
+        <div className="reports-header">
         <h1>📊 Raporty i Statystyki</h1>
 
         <button
@@ -281,6 +299,7 @@ export const DashboardReportsPage = () => {
           )}
         </div>
       </section>
+      </div>
     </div>
   );
 };

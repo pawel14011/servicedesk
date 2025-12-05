@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { generateTicketPDF } from '../services/pdfService';
 import { getUserDetails } from '../services/userService';
 import { ImageUploader } from '../components/ImageUploader';
+import { Navbar } from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import {
   getTicketDetails,
@@ -15,6 +16,7 @@ import {
   updatePartStatus,
 } from '../services/ticketService';
 import '../styles/ticket-detail.css';
+import '../styles/dashboard.css';
 
 export const TicketDetailPage = () => {
   const { ticketId } = useParams();
@@ -170,16 +172,26 @@ export const TicketDetailPage = () => {
   // Worker nie może dodawać części i notatek - tylko rejestruje zgłoszenia
 
   if (loading) {
-    return <div className="ticket-detail-container">Ładowanie...</div>;
+    return (
+      <div className="dashboard">
+        <Navbar />
+        <div className="ticket-detail-container" style={{ padding: '20px' }}>
+          Ładowanie...
+        </div>
+      </div>
+    );
   }
 
   if (error || !ticket) {
     return (
-      <div className="ticket-detail-container">
-        <p className="error-message">{error || 'Nie znaleziono ticketu'}</p>
-        <button onClick={() => navigate(-1)} className="btn-back">
-          ← Wróć
-        </button>
+      <div className="dashboard">
+        <Navbar />
+        <div className="ticket-detail-container" style={{ padding: '20px' }}>
+          <p className="error-message">{error || 'Nie znaleziono ticketu'}</p>
+          <button onClick={() => navigate(-1)} className="btn-back">
+            ← Wróć
+          </button>
+        </div>
       </div>
     );
   }
@@ -188,13 +200,15 @@ export const TicketDetailPage = () => {
   const totalPartsCost = parts.reduce((sum, p) => sum + p.unitPrice * p.quantity, 0);
 
   return (
-    <div className="ticket-detail-container">
-      <button onClick={() => navigate(-1)} className="btn-back">
-        ← Wróć do listy
-      </button>
+    <div className="dashboard">
+      <Navbar />
+      <div className="ticket-detail-container" style={{ padding: '20px' }}>
+        <button onClick={() => navigate(-1)} className="btn-back">
+          ← Wróć do listy
+        </button>
 
-      <div className="ticket-detail-card">
-        <div className="ticket-header">
+        <div className="ticket-detail-card">
+          <div className="ticket-header">
           <button
             onClick={async () => {
               try {
@@ -232,11 +246,11 @@ export const TicketDetailPage = () => {
               })}
             </p>
           </div>
-        </div>
+          </div>
 
-        {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message">{error}</div>}
 
-        <div className="ticket-sections">
+          <div className="ticket-sections">
           {/* Opisannie */}
           <section className="ticket-section">
             <h3>📋 Opis problemu</h3>
@@ -519,6 +533,7 @@ export const TicketDetailPage = () => {
               </div>
             )}
           </section>
+          </div>
         </div>
       </div>
     </div>

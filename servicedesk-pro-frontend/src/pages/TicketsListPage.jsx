@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllTickets, getClientTickets, getTechnicianTickets } from '../services/ticketService';
+import { Navbar } from '../components/Navbar';
 import '../styles/tickets-list.css';
+import '../styles/dashboard.css';
 
 export const TicketsListPage = () => {
   const { user, userRole } = useAuth();
@@ -57,15 +59,19 @@ export const TicketsListPage = () => {
   };
 
   return (
-    <div className="tickets-list-container">
-      <div className="tickets-header">
-        <h2>Zgłoszenia serwisowe</h2>
+    <div className="dashboard">
+      <Navbar />
+      <div className="tickets-list-container" style={{ padding: '20px' }}>
+        <div className="tickets-header">
+          <h2>Zgłoszenia serwisowe</h2>
+        </div>
         {userRole === 'client' && (
-          <button onClick={() => navigate('/create-ticket')} className="btn-primary">
-            + Nowe zgłoszenie
-          </button>
+          <div style={{ marginBottom: '20px' }}>
+            <button onClick={() => navigate('/create-ticket')} className="btn-add-action">
+              ➕ Nowe zgłoszenie
+            </button>
+          </div>
         )}
-      </div>
 
       <div className="tickets-filters">
         <button className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>
@@ -148,6 +154,7 @@ export const TicketsListPage = () => {
           </tbody>
         </table>
       )}
+      </div>
     </div>
   );
 };

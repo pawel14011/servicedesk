@@ -7,7 +7,9 @@ import {
   assignTicketToTechnician,
 } from '../services/ticketService';
 import { uploadImage } from '../services/storageService';
+import { Navbar } from '../components/Navbar';
 import '../styles/ticket-form.css';
+import '../styles/dashboard.css';
 
 export const CreateTicketPage = () => {
   const { user, userRole } = useAuth();
@@ -140,10 +142,12 @@ export const CreateTicketPage = () => {
   };
 
   return (
-    <div className="ticket-form-container">
-      <h2>Zgłoś nową awarię</h2>
+    <div className="dashboard">
+      <Navbar />
+      <div className="ticket-form-container" style={{ padding: '20px' }}>
+        <h2>Zgłoś nową awarię</h2>
 
-      {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="form-section">
@@ -258,6 +262,7 @@ export const CreateTicketPage = () => {
           {loading ? 'Tworzenie zgłoszenia...' : 'Zgłoś awarię'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

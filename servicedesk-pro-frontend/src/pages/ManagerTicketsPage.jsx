@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllTickets, reassignTicket, getTechnicianStats } from '../services/ticketService';
 import { getUsersByRole } from '../services/userService';
+import { Navbar } from '../components/Navbar';
 import '../styles/manager-tickets.css';
+import '../styles/dashboard.css';
 
 export const ManagerTicketsPage = () => {
   const { user } = useAuth();
@@ -84,8 +86,10 @@ export const ManagerTicketsPage = () => {
   };
 
   return (
-    <div className="manager-tickets-container">
-      <div className="manager-header">
+    <div className="dashboard">
+      <Navbar />
+      <div className="manager-tickets-container" style={{ padding: '20px' }}>
+        <div className="manager-header">
         <h2>📊 Manager — Zarządzanie ticketami</h2>
         <button onClick={fetchData} className="btn-refresh">
           🔄 Odśwież
@@ -232,6 +236,7 @@ export const ManagerTicketsPage = () => {
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 };

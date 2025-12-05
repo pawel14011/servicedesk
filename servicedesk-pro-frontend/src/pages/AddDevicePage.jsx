@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createDevice } from '../services/deviceService';
+import { Navbar } from '../components/Navbar';
 import '../styles/device-form.css';
+import '../styles/dashboard.css';
 
 export const AddDevicePage = () => {
   const { user, userRole } = useAuth();
@@ -54,10 +56,12 @@ export const AddDevicePage = () => {
   };
 
   return (
-    <div className="device-form-container">
-      <h2>Dodaj nowe urządzenie</h2>
+    <div className="dashboard">
+      <Navbar />
+      <div className="device-form-container" style={{ padding: '20px' }}>
+        <h2>Dodaj nowe urządzenie</h2>
 
-      {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="form-section">
@@ -120,6 +124,7 @@ export const AddDevicePage = () => {
           {loading ? 'Dodawanie...' : 'Dodaj urządzenie'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

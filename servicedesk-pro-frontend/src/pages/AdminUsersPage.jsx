@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-
-
 import { useAuth } from '../context/AuthContext';
 import {
   getAllUsers,
@@ -12,7 +10,9 @@ import {
   createUserProfile,
   createUserWithAccount,
 } from '../services/userService';
+import { Navbar } from '../components/Navbar';
 import '../styles/admin-users.css';
+import '../styles/dashboard.css';
 
 export const AdminUsersPage = () => {
   const { user } = useAuth();
@@ -56,11 +56,22 @@ export const AdminUsersPage = () => {
 
   const handleSave = async (userId) => {
     try {
+      const oldUser = users.find((u) => u.id === userId);
+      const roleChanged = oldUser && oldUser.role !== editFormData.role;
+
+      // Aktualizuj dane użytkownika
       await updateUser(userId, {
         fullName: editFormData.fullName,
         phone: editFormData.phone,
         email: editFormData.email,
+        role: editFormData.role,
       });
+
+      // Jeśli rola się zmieniła, użyj funkcji changeUserRole dla pewności
+      if (roleChanged) {
+        await changeUserRole(userId, editFormData.role);
+      }
+
       setEditingId(null);
       await fetchUsers();
       alert('✅ Użytkownik zaktualizowany');
@@ -185,13 +196,15 @@ export const AdminUsersPage = () => {
   };
 
   return (
-    <div className="admin-users-container">
-      <div className="admin-header">
-        <h2>👥 Zarządzanie Użytkownikami</h2>
-        <button onClick={() => setShowNewUserForm(true)} className="btn-add-user">
-          ➕ Dodaj użytkownika
-        </button>
-      </div>
+    <div className="dashboard">
+      <Navbar />
+      <div className="admin-users-container" style={{ padding: '20px' }}>
+        <div className="admin-header">
+          <h2>👥 Zarządzanie Użytkownikami</h2>
+          <button onClick={() => setShowNewUserForm(true)} className="btn-add-user">
+            ➕ Dodaj użytkownika
+          </button>
+        </div>
 
       {/* Formularz dodawania nowego użytkownika */}
       {showNewUserForm && (
@@ -433,6 +446,7 @@ export const AdminUsersPage = () => {
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 };

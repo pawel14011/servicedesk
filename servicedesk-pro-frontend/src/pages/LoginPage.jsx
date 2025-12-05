@@ -58,15 +58,6 @@ export const LoginPage = () => {
         <p>
           Nie masz konta? <a href="/register">Zarejestruj się</a>
         </p>
-
-        <hr />
-        <h3>Demo Konta:</h3>
-        <ul>
-          <li>👤 Client: client@example.com / password123</li>
-          <li>👷 Worker: worker@example.com / password123</li>
-          <li>🔧 Technician: technician@example.com / password123</li>
-          <li>📊 Manager: manager@example.com / password123</li>
-        </ul>
       </div>
     </div>
   );

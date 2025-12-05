@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getDeviceDetails, getDeviceRepairHistory } from '../services/deviceService';
+import { Navbar } from '../components/Navbar';
 import '../styles/device-detail.css';
+import '../styles/dashboard.css';
 
 export const DeviceDetailPage = () => {
   const { deviceId } = useParams();
@@ -49,38 +51,50 @@ export const DeviceDetailPage = () => {
   };
 
   if (loading) {
-    return <div className="device-detail-container">Ładowanie...</div>;
+    return (
+      <div className="dashboard">
+        <Navbar />
+        <div className="device-detail-container" style={{ padding: '20px' }}>
+          Ładowanie...
+        </div>
+      </div>
+    );
   }
 
   if (error || !device) {
     return (
-      <div className="device-detail-container">
-        <p className="error-message">{error || 'Nie znaleziono urządzenia'}</p>
-        <button onClick={() => navigate(-1)} className="btn-back">
-          ← Wróć
-        </button>
+      <div className="dashboard">
+        <Navbar />
+        <div className="device-detail-container" style={{ padding: '20px' }}>
+          <p className="error-message">{error || 'Nie znaleziono urządzenia'}</p>
+          <button onClick={() => navigate(-1)} className="btn-back">
+            ← Wróć
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="device-detail-container">
-      <button onClick={() => navigate(-1)} className="btn-back">
-        ← Wróć do listy
-      </button>
+    <div className="dashboard">
+      <Navbar />
+      <div className="device-detail-container" style={{ padding: '20px' }}>
+        <button onClick={() => navigate(-1)} className="btn-back">
+          ← Wróć do listy
+        </button>
 
-      <div className="device-detail-card">
-        <div className="device-header">
-          <div>
-            <h2>
-              {device.brand} {device.model}
-            </h2>
+        <div className="device-detail-card">
+          <div className="device-header">
+            <div>
+              <h2>
+                {device.brand} {device.model}
+              </h2>
+            </div>
           </div>
-        </div>
 
-        {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message">{error}</div>}
 
-        <div className="device-sections">
+          <div className="device-sections">
           {/* Informacje ogólne */}
           <section className="device-section">
             <h3>📋 Informacje ogólne</h3>
@@ -138,6 +152,7 @@ export const DeviceDetailPage = () => {
               <p style={{ color: '#999' }}>Brak historii napraw</p>
             )}
           </section>
+          </div>
         </div>
       </div>
     </div>

@@ -8,7 +8,9 @@ import {
 } from '../services/ticketService';
 import { getUsersByRole, createUserProfile } from '../services/userService';
 import { getClientDevices, createDevice } from '../services/deviceService';
+import { Navbar } from '../components/Navbar';
 import '../styles/ticket-form.css';
+import '../styles/dashboard.css';
 
 export const CreateTicketByWorkerPage = () => {
   const { user } = useAuth();
@@ -204,10 +206,12 @@ export const CreateTicketByWorkerPage = () => {
   const showDeviceSection = formData.clientId && formData.clientId !== '';
 
   return (
-    <div className="ticket-form-container">
-      <h2>Nowe zgłoszenie serwisowe (Worker)</h2>
+    <div className="dashboard">
+      <Navbar />
+      <div className="ticket-form-container" style={{ padding: '20px' }}>
+        <h2>Nowe zgłoszenie serwisowe (Worker)</h2>
 
-      {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         {/* Wybór klienta */}
@@ -437,6 +441,7 @@ export const CreateTicketByWorkerPage = () => {
           {loading ? 'Tworzenie zgłoszenia...' : 'Zarejestruj zgłoszenie'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

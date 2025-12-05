@@ -46,9 +46,6 @@ export const DashboardPage = () => {
                 <button onClick={() => navigate('/devices')} className="nav-button">
                   🖥️ Moje urządzenia
                 </button>
-                <button onClick={() => navigate('/dashboard')} className="nav-button">
-                  🏠 Strona główna
-                </button>
               </div>
             </div>
           )}
@@ -68,9 +65,6 @@ export const DashboardPage = () => {
                 <button onClick={() => navigate('/devices')} className="nav-button">
                   🖥️ Wszystkie urządzenia
                 </button>
-                <button onClick={() => navigate('/dashboard')} className="nav-button">
-                  🏠 Strona główna
-                </button>
               </div>
             </div>
           )}
@@ -86,9 +80,6 @@ export const DashboardPage = () => {
                 </button>
                 <button onClick={() => navigate('/devices')} className="nav-button">
                   🖥️ Wszystkie urządzenia
-                </button>
-                <button onClick={() => navigate('/dashboard')} className="nav-button">
-                  🏠 Strona główna
                 </button>
               </div>
             </div>
@@ -112,9 +103,6 @@ export const DashboardPage = () => {
                 </button>
                 <button onClick={() => navigate('/users')} className="nav-button">
                   👥 Użytkownicy
-                </button>
-                <button onClick={() => navigate('/dashboard')} className="nav-button">
-                  🏠 Strona główna
                 </button>
               </div>
             </div>

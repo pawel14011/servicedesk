@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllDevices, getClientDevices, getDeviceRepairHistory } from '../services/deviceService';
+import { Navbar } from '../components/Navbar';
 import '../styles/devices-list.css';
+import '../styles/dashboard.css';
 
 export const DevicesListPage = () => {
   const { user, userRole } = useAuth();
@@ -53,15 +55,19 @@ export const DevicesListPage = () => {
 
 
   return (
-    <div className="devices-list-container">
-      <div className="devices-header">
-        <h2>Urządzenia</h2>
+    <div className="dashboard">
+      <Navbar />
+      <div className="devices-list-container" style={{ padding: '20px' }}>
+        <div className="devices-header">
+          <h2>Urządzenia</h2>
+        </div>
         {userRole === 'client' && (
-          <button onClick={() => navigate('/add-device')} className="btn-primary">
-            + Dodaj urządzenie
-          </button>
+          <div style={{ marginBottom: '20px' }}>
+            <button onClick={() => navigate('/add-device')} className="btn-add-action">
+              ➕ Dodaj urządzenie
+            </button>
+          </div>
         )}
-      </div>
 
       {loading ? (
         <p>Ładowanie...</p>
@@ -96,6 +102,7 @@ export const DevicesListPage = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };
