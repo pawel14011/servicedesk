@@ -22,10 +22,15 @@ export const TicketsListPage = () => {
       if (userRole === 'manager') {
         data = await getAllTickets();
       } else if (userRole === 'client') {
+        // Klient widzi tylko swoje tickety
         data = await getClientTickets(user.uid);
       } else if (userRole === 'technician') {
-        data = await getTechnicianTickets(user.uid);
+        // Technik widzi tylko przypisane tickety
+        if (user?.uid) {
+          data = await getTechnicianTickets(user.uid);
+        }
       } else if (userRole === 'worker') {
+        // Worker widzi wszystkie tickety (tylko do przeglądania)
         data = await getAllTickets();
       }
       setTickets(data);
@@ -77,6 +82,18 @@ export const TicketsListPage = () => {
           onClick={() => setFilter('Received')}
         >
           Przyjęte
+        </button>
+        <button
+          className={filter === 'Waiting for Parts' ? 'active' : ''}
+          onClick={() => setFilter('Waiting for Parts')}
+        >
+          Oczekujące na części
+        </button>
+        <button
+          className={filter === 'Repairing' ? 'active' : ''}
+          onClick={() => setFilter('Repairing')}
+        >
+          W naprawie
         </button>
         <button className={filter === 'Ready' ? 'active' : ''} onClick={() => setFilter('Ready')}>
           Gotowe

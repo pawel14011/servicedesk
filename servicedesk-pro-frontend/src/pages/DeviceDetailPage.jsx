@@ -63,11 +63,6 @@ export const DeviceDetailPage = () => {
     );
   }
 
-  const warrantyActive = device.warrantyStatus === 'active';
-  const daysUntilExpiry = device.warrantyExpireDate
-    ? Math.ceil((new Date(device.warrantyExpireDate) - new Date()) / (1000 * 60 * 60 * 24))
-    : null;
-
   return (
     <div className="device-detail-container">
       <button onClick={() => navigate(-1)} className="btn-back">
@@ -80,19 +75,7 @@ export const DeviceDetailPage = () => {
             <h2>
               {device.brand} {device.model}
             </h2>
-            <span className={`warranty-badge ${warrantyActive ? 'active' : 'expired'}`}>
-              {warrantyActive ? '✅ Gwarancja aktywna' : '❌ Gwarancja wygasła'}
-            </span>
           </div>
-          {daysUntilExpiry !== null && (
-            <div className="warranty-info">
-              <p>
-                {warrantyActive
-                  ? `Gwarancja wygasa za ${daysUntilExpiry} dni`
-                  : `Wygasła ${Math.abs(daysUntilExpiry)} dni temu`}
-              </p>
-            </div>
-          )}
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -114,12 +97,6 @@ export const DeviceDetailPage = () => {
               <div>
                 <strong>Rok produkcji:</strong> {device.yearProduction || 'Brak'}
               </div>
-              {device.warrantyExpireDate && (
-                <div>
-                  <strong>Gwarancja do:</strong>{' '}
-                  {new Date(device.warrantyExpireDate).toLocaleDateString('pl-PL')}
-                </div>
-              )}
               <div>
                 <strong>Data dodania:</strong>{' '}
                 {new Date(device.createdAt).toLocaleDateString('pl-PL')}

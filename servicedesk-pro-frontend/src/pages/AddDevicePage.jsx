@@ -15,10 +15,6 @@ export const AddDevicePage = () => {
     model: '',
     serialNumber: '',
     yearProduction: new Date().getFullYear(),
-    warrantyStatus: 'active',
-    warrantyExpireDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0],
   });
 
   const handleChange = (e) => {
@@ -34,13 +30,17 @@ export const AddDevicePage = () => {
     setError('');
     setLoading(true);
 
+    // Walidacja roku produkcji
+    if (formData.yearProduction < 2000) {
+      setError('Rok produkcji nie może być starszy niż 2000');
+      setLoading(false);
+      return;
+    }
+
     try {
       await createDevice({
         ...formData,
         ownerId: user.uid,
-        warrantyExpireDate: formData.warrantyExpireDate
-          ? new Date(formData.warrantyExpireDate).toISOString()
-          : null,
       });
 
       alert('✅ Urządzenie dodane!');
@@ -107,31 +107,14 @@ export const AddDevicePage = () => {
               onChange={handleChange}
               min="2000"
               max={new Date().getFullYear()}
+              required
             />
+            {formData.yearProduction < 2000 && (
+              <small style={{ color: 'red' }}>Rok produkcji nie może być starszy niż 2000</small>
+            )}
           </div>
         </div>
 
-        <div className="form-section">
-          <h3>Gwarancja</h3>
-
-          <div className="form-group">
-            <label>Status gwarancji:</label>
-            <select name="warrantyStatus" value={formData.warrantyStatus} onChange={handleChange}>
-              <option value="active">Aktywna</option>
-              <option value="expired">Wygasła</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Data wygaśnięcia gwarancji (opcjonalnie):</label>
-            <input
-              type="date"
-              name="warrantyExpireDate"
-              value={formData.warrantyExpireDate}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
 
         <button type="submit" disabled={loading} className="btn-submit">
           {loading ? 'Dodawanie...' : 'Dodaj urządzenie'}

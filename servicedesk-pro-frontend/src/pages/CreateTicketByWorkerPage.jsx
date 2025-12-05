@@ -117,13 +117,13 @@ export const CreateTicketByWorkerPage = () => {
           serialNumber: formData.deviceSerialNumber,
           yearProduction: parseInt(formData.deviceYear),
           ownerId: clientId,
-          warrantyStatus: 'unknown',
           assetTag: formData.assetTag,
         });
         console.log('✅ New device created:', deviceId);
       }
 
       // 3. Utwórz ticket
+      const selectedDevice = clientDevices.find((d) => d.id === deviceId);
       const ticketId = await createTicket({
         clientId: clientId,
         deviceId: deviceId,
@@ -132,14 +132,10 @@ export const CreateTicketByWorkerPage = () => {
         assetTag: formData.assetTag,
         createdBy: user.uid,
         device: {
-          brand: formData.deviceBrand || clientDevices.find((d) => d.id === deviceId)?.brand,
-          model: formData.deviceModel || clientDevices.find((d) => d.id === deviceId)?.model,
-          serialNumber:
-            formData.deviceSerialNumber ||
-            clientDevices.find((d) => d.id === deviceId)?.serialNumber,
-          year:
-            parseInt(formData.deviceYear) ||
-            clientDevices.find((d) => d.id === deviceId)?.yearProduction,
+          brand: formData.deviceBrand || selectedDevice?.brand,
+          model: formData.deviceModel || selectedDevice?.model,
+          serialNumber: formData.deviceSerialNumber || selectedDevice?.serialNumber,
+          year: parseInt(formData.deviceYear) || selectedDevice?.yearProduction,
         },
       });
 

@@ -38,6 +38,10 @@ export const getAllTickets = async () => {
 // Pobierz tickety dla konkretnego klienta
 export const getClientTickets = async (clientId) => {
   try {
+    if (!clientId) {
+      return [];
+    }
+
     const q = query(
       collection(db, 'tickets'),
       where('clientId', '==', clientId),
@@ -51,6 +55,24 @@ export const getClientTickets = async (clientId) => {
     return tickets;
   } catch (error) {
     console.error('Error fetching client tickets:', error);
+    // Jeśli błąd związany z indeksem, zwróć puste
+    if (error.code === 'failed-precondition') {
+      console.warn('Index not found, trying without orderBy');
+      // Spróbuj bez orderBy
+      try {
+        const q2 = query(collection(db, 'tickets'), where('clientId', '==', clientId));
+        const querySnapshot2 = await getDocs(q2);
+        const tickets = querySnapshot2.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        // Sortuj ręcznie
+        return tickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } catch (err2) {
+        console.error('Error fetching client tickets (fallback):', err2);
+        return [];
+      }
+    }
     throw error;
   }
 };
@@ -58,6 +80,11 @@ export const getClientTickets = async (clientId) => {
 // Pobierz tickety przypisane do technika
 export const getTechnicianTickets = async (technicianId) => {
   try {
+    // Sprawdź czy technik istnieje
+    if (!technicianId) {
+      return [];
+    }
+
     const q = query(
       collection(db, 'tickets'),
       where('technicianId', '==', technicianId),
@@ -71,6 +98,11 @@ export const getTechnicianTickets = async (technicianId) => {
     return tickets;
   } catch (error) {
     console.error('Error fetching technician tickets:', error);
+    // Jeśli błąd związany z indeksem, zwróć puste
+    if (error.code === 'failed-precondition') {
+      console.warn('Index not found, returning empty array');
+      return [];
+    }
     throw error;
   }
 };
@@ -108,6 +140,18 @@ export const createTicket = async (ticketData) => {
       ],
     });
     console.log('✅ Ticket created:', docRef.id);
+
+    // Jeśli ticket ma deviceId, od razu powiąż go z urządzeniem
+    if (ticketData.deviceId) {
+      try {
+        const { linkTicketToDevice } = await import('./deviceService');
+        await linkTicketToDevice(ticketData.deviceId, docRef.id);
+        console.log(`✅ Ticket ${docRef.id} linked to device ${ticketData.deviceId}`);
+      } catch (linkError) {
+        console.warn('Could not link ticket to device:', linkError);
+      }
+    }
+
     return docRef.id;
   } catch (error) {
     console.error('Error creating ticket:', error);
@@ -120,7 +164,8 @@ export const updateTicketStatus = async (ticketId, newStatus, userId) => {
   try {
     const ticketRef = doc(db, 'tickets', ticketId);
     const ticketSnap = await getDoc(ticketRef);
-    const currentStatusHistory = ticketSnap.data().statusHistory || [];
+    const ticketData = ticketSnap.data();
+    const currentStatusHistory = ticketData.statusHistory || [];
 
     await updateDoc(ticketRef, {
       status: newStatus,
@@ -133,6 +178,19 @@ export const updateTicketStatus = async (ticketId, newStatus, userId) => {
         },
       ],
     });
+
+    // Jeśli ticket jest zakończony (Ready lub Closed) i ma deviceId, dodaj do repairHistory
+    if ((newStatus === 'Ready' || newStatus === 'Closed') && ticketData.deviceId) {
+      try {
+        const { linkTicketToDevice } = await import('./deviceService');
+        await linkTicketToDevice(ticketData.deviceId, ticketId);
+        console.log(`✅ Ticket ${ticketId} linked to device ${ticketData.deviceId}`);
+      } catch (linkError) {
+        console.warn('Could not link ticket to device:', linkError);
+        // Nie blokuj zmiany statusu jeśli linkowanie się nie udało
+      }
+    }
+
     console.log(`✅ Ticket ${ticketId} updated to ${newStatus}`);
   } catch (error) {
     console.error('Error updating ticket status:', error);

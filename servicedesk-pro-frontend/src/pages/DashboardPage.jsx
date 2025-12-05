@@ -36,9 +36,20 @@ export const DashboardPage = () => {
             <div>
               <h3>📋 Panel Klienta</h3>
               <p>Możesz zgłaszać awarie i śledzić ich status</p>
-              <button onClick={() => navigate('/create-ticket')}>Zgłoś nową awarię</button>
-              <button onClick={() => navigate('/my-tickets')}>Moje zgłoszenia</button>
-              <button onClick={() => navigate('/devices')}>Moje urządzenia</button>
+              <div className="dashboard-nav">
+                <button onClick={() => navigate('/create-ticket')} className="nav-button">
+                  ➕ Zgłoś nową awarię
+                </button>
+                <button onClick={() => navigate('/my-tickets')} className="nav-button">
+                  📋 Moje zgłoszenia
+                </button>
+                <button onClick={() => navigate('/devices')} className="nav-button">
+                  🖥️ Moje urządzenia
+                </button>
+                <button onClick={() => navigate('/dashboard')} className="nav-button">
+                  🏠 Strona główna
+                </button>
+              </div>
             </div>
           )}
 
@@ -47,11 +58,20 @@ export const DashboardPage = () => {
             <div>
               <h3>👷 Panel Pracownika</h3>
               <p>Możesz rejestrować zgłoszenia i urządzenia</p>
-              <button onClick={() => navigate('/create-ticket-worker')}>
-                Nowe zgłoszenie (Worker)
-              </button>
-              <button onClick={() => navigate('/my-tickets')}>Wszystkie zgłoszenia</button>
-              <button onClick={() => navigate('/devices')}>Wszystkie urządzenia</button>
+              <div className="dashboard-nav">
+                <button onClick={() => navigate('/create-ticket-worker')} className="nav-button">
+                  ➕ Nowe zgłoszenie
+                </button>
+                <button onClick={() => navigate('/my-tickets')} className="nav-button">
+                  📋 Wszystkie zgłoszenia
+                </button>
+                <button onClick={() => navigate('/devices')} className="nav-button">
+                  🖥️ Wszystkie urządzenia
+                </button>
+                <button onClick={() => navigate('/dashboard')} className="nav-button">
+                  🏠 Strona główna
+                </button>
+              </div>
             </div>
           )}
 
@@ -60,8 +80,17 @@ export const DashboardPage = () => {
             <div>
               <h3>🔧 Panel Technika</h3>
               <p>Możesz przeglądać i naprawiać przypisane urządzenia</p>
-              <button onClick={() => navigate('/my-tickets')}>Moje zgłoszenia</button>
-              <button onClick={() => navigate('/devices')}>Wszystkie urządzenia</button>
+              <div className="dashboard-nav">
+                <button onClick={() => navigate('/my-tickets')} className="nav-button">
+                  📋 Moje zgłoszenia
+                </button>
+                <button onClick={() => navigate('/devices')} className="nav-button">
+                  🖥️ Wszystkie urządzenia
+                </button>
+                <button onClick={() => navigate('/dashboard')} className="nav-button">
+                  🏠 Strona główna
+                </button>
+              </div>
             </div>
           )}
 
@@ -71,10 +100,23 @@ export const DashboardPage = () => {
             <div>
               <h3>📊 Panel Menedżera</h3>
               <p>Masz dostęp do wszystkich funkcji i raportów</p>
-              <button onClick={() => navigate('/manager-tickets')}>Zarządzanie ticketami</button>
-              <button onClick={() => navigate('/devices')}>Wszystkie urządzenia</button>
-              <button onClick={() => navigate('/reports')}>Raporty</button>
-              <button onClick={() => navigate('/users')}>Użytkownicy</button>
+              <div className="dashboard-nav">
+                <button onClick={() => navigate('/manager-tickets')} className="nav-button">
+                  📋 Zarządzanie ticketami
+                </button>
+                <button onClick={() => navigate('/devices')} className="nav-button">
+                  🖥️ Wszystkie urządzenia
+                </button>
+                <button onClick={() => navigate('/reports')} className="nav-button">
+                  📊 Raporty
+                </button>
+                <button onClick={() => navigate('/users')} className="nav-button">
+                  👥 Użytkownicy
+                </button>
+                <button onClick={() => navigate('/dashboard')} className="nav-button">
+                  🏠 Strona główna
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -83,9 +83,26 @@ export const createDevice = async (deviceData) => {
 // Powiąż ticket z urządzeniem (dodaj do historii)
 export const linkTicketToDevice = async (deviceId, ticketId) => {
   try {
+    if (!deviceId || !ticketId) {
+      console.warn('Missing deviceId or ticketId for linking');
+      return;
+    }
+
     const deviceRef = doc(db, 'devices', deviceId);
     const deviceSnap = await getDoc(deviceRef);
+    
+    if (!deviceSnap.exists()) {
+      console.warn(`Device ${deviceId} does not exist`);
+      return;
+    }
+
     const repairHistory = deviceSnap.data().repairHistory || [];
+    
+    // Sprawdź czy ticket już nie jest w historii
+    if (repairHistory.includes(ticketId)) {
+      console.log(`Ticket ${ticketId} already in device history`);
+      return;
+    }
 
     await updateDoc(deviceRef, {
       repairHistory: [...repairHistory, ticketId],
@@ -136,6 +153,7 @@ export const updateDevice = async (deviceId, updateData) => {
     throw error;
   }
 };
+
 
 // Pobierz historię napraw dla urządzenia (z detałami ticketów)
 export const getDeviceRepairHistory = async (deviceId) => {

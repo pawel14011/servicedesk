@@ -1,7 +1,30 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// Generuj PDF formularza ticketu
+// Helper function to encode Polish characters
+const encodePolishChars = (text) => {
+  if (!text) return '';
+  return String(text)
+    .replace(/ą/g, 'a')
+    .replace(/ć/g, 'c')
+    .replace(/ę/g, 'e')
+    .replace(/ł/g, 'l')
+    .replace(/ń/g, 'n')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/Ą/g, 'A')
+    .replace(/Ć/g, 'C')
+    .replace(/Ę/g, 'E')
+    .replace(/Ł/g, 'L')
+    .replace(/Ń/g, 'N')
+    .replace(/Ó/g, 'O')
+    .replace(/Ś/g, 'S')
+    .replace(/Ź/g, 'Z')
+    .replace(/Ż/g, 'Z');
+};
+
 // Generuj PDF formularza ticketu
 export const generateTicketPDF = async (ticket, user, technician) => {
   try {
@@ -10,7 +33,7 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     const pageWidth = doc.internal.pageSize.getWidth();
     let yPosition = 10;
 
-    // Font
+    // Font - używamy standardowego fontu, polskie znaki będą zakodowane
     doc.setFont('helvetica');
 
     // ============= HEADER =============
@@ -18,7 +41,7 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     doc.rect(0, 0, pageWidth, 20, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text('ServiceDesk Pro - Formularz Zgłoszenia', 10, 15);
+    doc.text(encodePolishChars('ServiceDesk Pro - Formularz Zgloszenia'), 10, 15);
 
     yPosition = 30;
     doc.setTextColor(0, 0, 0);
@@ -26,16 +49,16 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     // ============= INFORMACJE TICKETU =============
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('INFORMACJE ZGŁOSZENIA', 10, yPosition);
+    doc.text(encodePolishChars('INFORMACJE ZGLOSZENIA'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const ticketInfo = [
-      ['Nr. Ticketu:', String(ticket.ticketNumber || 'Brak')],
-      ['Status:', String(ticket.status || 'Brak')],
-      ['Data utworzenia:', ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('pl-PL') : 'Brak'],
-      ['Asset Tag:', String(ticket.assetTag || 'Brak')],
+      [encodePolishChars('Nr. Ticketu:'), encodePolishChars(String(ticket.ticketNumber || 'Brak'))],
+      [encodePolishChars('Status:'), encodePolishChars(String(ticket.status || 'Brak'))],
+      [encodePolishChars('Data utworzenia:'), ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('pl-PL') : 'Brak'],
+      [encodePolishChars('Asset Tag:'), encodePolishChars(String(ticket.assetTag || 'Brak'))],
     ];
 
     ticketInfo.forEach(info => {
@@ -49,29 +72,29 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     // ============= DANE KLIENTA =============
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('DANE KLIENTA', 10, yPosition);
+    doc.text(encodePolishChars('DANE KLIENTA'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Email: ${String(user?.email || 'Brak')}`, 10, yPosition);
+    doc.text(encodePolishChars(`Email: ${String(user?.email || 'Brak')}`), 10, yPosition);
     yPosition += 6;
-    doc.text(`Telefon: ${String(user?.phone || 'Brak')}`, 10, yPosition);
+    doc.text(encodePolishChars(`Telefon: ${String(user?.phone || 'Brak')}`), 10, yPosition);
     yPosition += 10;
 
     // ============= DANE URZĄDZENIA =============
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('DANE URZĄDZENIA', 10, yPosition);
+    doc.text(encodePolishChars('DANE URZADZENIA'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const deviceInfo = [
-      ['Marka:', String(ticket.device?.brand || 'Brak')],
-      ['Model:', String(ticket.device?.model || 'Brak')],
-      ['Nr. seryjny:', String(ticket.device?.serialNumber || 'Brak')],
-      ['Rok produkcji:', String(ticket.device?.year || 'Brak')], // ← POPRAWKA
+      [encodePolishChars('Marka:'), encodePolishChars(String(ticket.device?.brand || 'Brak'))],
+      [encodePolishChars('Model:'), encodePolishChars(String(ticket.device?.model || 'Brak'))],
+      [encodePolishChars('Nr. seryjny:'), encodePolishChars(String(ticket.device?.serialNumber || 'Brak'))],
+      [encodePolishChars('Rok produkcji:'), encodePolishChars(String(ticket.device?.year || 'Brak'))],
     ];
 
     deviceInfo.forEach(info => {
@@ -85,12 +108,12 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     // ============= OPIS PROBLEMU =============
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('OPIS PROBLEMU', 10, yPosition);
+    doc.text(encodePolishChars('OPIS PROBLEMU'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    const descriptionLines = doc.splitTextToSize(String(ticket.description || 'Brak'), 190);
+    const descriptionLines = doc.splitTextToSize(encodePolishChars(String(ticket.description || 'Brak')), 190);
     doc.text(descriptionLines, 10, yPosition);
     yPosition += descriptionLines.length * 6 + 5;
 
@@ -98,22 +121,22 @@ export const generateTicketPDF = async (ticket, user, technician) => {
     if (technician) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
-      doc.text('PRZYPISANIE', 10, yPosition);
+      doc.text(encodePolishChars('PRZYPISANIE'), 10, yPosition);
       yPosition += 8;
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.text(`Technik: ${String(technician.fullName || 'Brak')}`, 10, yPosition);
+      doc.text(encodePolishChars(`Technik: ${String(technician.fullName || 'Brak')}`), 10, yPosition);
       yPosition += 6;
-      doc.text(`Email: ${String(technician.email || 'Brak')}`, 10, yPosition);
+      doc.text(encodePolishChars(`Email: ${String(technician.email || 'Brak')}`), 10, yPosition);
       yPosition += 6;
-      doc.text(`Telefon: ${String(technician.phone || 'Brak')}`, 10, yPosition);
+      doc.text(encodePolishChars(`Telefon: ${String(technician.phone || 'Brak')}`), 10, yPosition);
     }
 
     // ============= FOOTER =============
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Wygenerowano: ${new Date().toLocaleString('pl-PL')}`, 10, pageHeight - 10);
+    doc.text(encodePolishChars(`Wygenerowano: ${new Date().toLocaleString('pl-PL')}`), 10, pageHeight - 10);
     doc.text(`Ticket ID: ${String(ticket.id)}`, pageWidth - 50, pageHeight - 10);
 
     // Pobierz plik
@@ -128,6 +151,30 @@ export const generateTicketPDF = async (ticket, user, technician) => {
   }
 };
 
+
+// Helper function to encode Polish characters (reuse from above)
+const encodePolishCharsReport = (text) => {
+  if (!text) return '';
+  return String(text)
+    .replace(/ą/g, 'a')
+    .replace(/ć/g, 'c')
+    .replace(/ę/g, 'e')
+    .replace(/ł/g, 'l')
+    .replace(/ń/g, 'n')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/Ą/g, 'A')
+    .replace(/Ć/g, 'C')
+    .replace(/Ę/g, 'E')
+    .replace(/Ł/g, 'L')
+    .replace(/Ń/g, 'N')
+    .replace(/Ó/g, 'O')
+    .replace(/Ś/g, 'S')
+    .replace(/Ź/g, 'Z')
+    .replace(/Ż/g, 'Z');
+};
 
 // Generuj PDF raportu ticketów
 export const generateTicketsReportPDF = (tickets, stats) => {
@@ -144,7 +191,7 @@ export const generateTicketsReportPDF = (tickets, stats) => {
     doc.rect(0, 0, pageWidth, 20, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text('ServiceDesk Pro - Raport Ticketów', 10, 15);
+    doc.text(encodePolishCharsReport('ServiceDesk Pro - Raport Ticketow'), 10, 15);
 
     yPosition = 30;
     doc.setTextColor(0, 0, 0);
@@ -152,15 +199,15 @@ export const generateTicketsReportPDF = (tickets, stats) => {
     // ============= STATYSTYKI =============
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('STATYSTYKI', 10, yPosition);
+    doc.text(encodePolishCharsReport('STATYSTYKI'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const statsInfo = [
-      ['Łącznie ticketów:', stats.total],
-      ['Otwarte:', stats.open],
-      ['Zamknięte:', stats.closed],
+      [encodePolishCharsReport('Lacznie ticketow:'), stats.total],
+      [encodePolishCharsReport('Otwarte:'), stats.open],
+      [encodePolishCharsReport('Zamkniete:'), stats.closed],
     ];
 
     statsInfo.forEach((info) => {
@@ -174,7 +221,7 @@ export const generateTicketsReportPDF = (tickets, stats) => {
     // ============= LISTA TICKETÓW =============
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('LISTA TICKETÓW', 10, yPosition);
+    doc.text(encodePolishCharsReport('LISTA TICKETOW'), 10, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
@@ -184,9 +231,9 @@ export const generateTicketsReportPDF = (tickets, stats) => {
     doc.setFillColor(230, 230, 230);
     doc.rect(10, yPosition - 5, 190, 6, 'F');
     doc.text('Nr.', 12, yPosition);
-    doc.text('Status', 40, yPosition);
-    doc.text('Opis', 80, yPosition);
-    doc.text('Data', 160, yPosition);
+    doc.text(encodePolishCharsReport('Status'), 40, yPosition);
+    doc.text(encodePolishCharsReport('Opis'), 80, yPosition);
+    doc.text(encodePolishCharsReport('Data'), 160, yPosition);
     yPosition += 8;
 
     // Wiersze
@@ -197,8 +244,8 @@ export const generateTicketsReportPDF = (tickets, stats) => {
       }
 
       doc.text(String(idx + 1), 12, yPosition);
-      doc.text(ticket.status.substring(0, 15), 40, yPosition);
-      doc.text(ticket.description.substring(0, 30) + '...', 80, yPosition);
+      doc.text(encodePolishCharsReport(ticket.status.substring(0, 15)), 40, yPosition);
+      doc.text(encodePolishCharsReport(ticket.description.substring(0, 30) + '...'), 80, yPosition);
       doc.text(new Date(ticket.createdAt).toLocaleDateString('pl-PL'), 160, yPosition);
       yPosition += 6;
     });
@@ -206,7 +253,7 @@ export const generateTicketsReportPDF = (tickets, stats) => {
     // ============= FOOTER =============
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Wygenerowano: ${new Date().toLocaleString('pl-PL')}`, 10, pageHeight - 10);
+    doc.text(encodePolishCharsReport(`Wygenerowano: ${new Date().toLocaleString('pl-PL')}`), 10, pageHeight - 10);
 
     const filename = `tickets-report-${Date.now()}.pdf`;
     doc.save(filename);

@@ -163,10 +163,11 @@ export const TicketDetailPage = () => {
 
   const canChangeStatus =
     userRole === 'manager' ||
-    (userRole === 'technician' && ticket?.technicianId === user.uid) ||
-    userRole === 'worker';
+    (userRole === 'technician' && ticket?.technicianId === user.uid);
+  // Worker nie może zmieniać statusu - tylko rejestruje zgłoszenia
 
-  const isTechnician = userRole === 'technician' || userRole === 'manager' || userRole === 'worker';
+  const isTechnician = userRole === 'technician' || userRole === 'manager';
+  // Worker nie może dodawać części i notatek - tylko rejestruje zgłoszenia
 
   if (loading) {
     return <div className="ticket-detail-container">Ładowanie...</div>;

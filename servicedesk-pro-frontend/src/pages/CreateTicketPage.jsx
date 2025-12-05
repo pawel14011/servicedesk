@@ -69,10 +69,34 @@ export const CreateTicketPage = () => {
     setError('');
     setLoading(true);
 
+    // Walidacja roku produkcji
+    if (formData.deviceYear < 2000) {
+      setError('Rok produkcji nie może być starszy niż 2000');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // 1. Tworzymy ticket
+      // 1. Sprawdź czy urządzenie istnieje lub utwórz nowe
+      let deviceId = null;
+      if (formData.deviceSerialNumber) {
+        const { findOrCreateDeviceBySerial } = await import('../services/deviceService');
+        deviceId = await findOrCreateDeviceBySerial(
+          formData.deviceSerialNumber,
+          {
+            brand: formData.deviceBrand,
+            model: formData.deviceModel,
+            yearProduction: parseInt(formData.deviceYear),
+            ownerId: user.uid,
+          },
+          user.uid
+        );
+      }
+
+      // 2. Tworzymy ticket
       const ticketId = await createTicket({
         clientId: user.uid,
+        deviceId: deviceId,
         description: formData.description,
         device: {
           brand: formData.deviceBrand,
@@ -179,7 +203,11 @@ export const CreateTicketPage = () => {
               onChange={handleChange}
               min="2000"
               max={new Date().getFullYear()}
+              required
             />
+            {formData.deviceYear < 2000 && (
+              <small style={{ color: 'red' }}>Rok produkcji nie może być starszy niż 2000</small>
+            )}
           </div>
         </div>
 

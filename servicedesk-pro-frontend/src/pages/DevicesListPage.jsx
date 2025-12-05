@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getAllDevices, getClientDevices } from '../services/deviceService';
+import { getAllDevices, getClientDevices, getDeviceRepairHistory } from '../services/deviceService';
 import '../styles/devices-list.css';
 
 export const DevicesListPage = () => {
@@ -9,6 +9,7 @@ export const DevicesListPage = () => {
   const navigate = useNavigate();
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [repairCounts, setRepairCounts] = useState({});
 
   useEffect(() => {
     fetchDevices();
@@ -19,11 +20,29 @@ export const DevicesListPage = () => {
     try {
       let data = [];
       if (userRole === 'manager' || userRole === 'worker' || userRole === 'technician') {
+        // Manager, worker i technik widzą wszystkie urządzenia
         data = await getAllDevices();
       } else if (userRole === 'client') {
-        data = await getClientDevices(user.uid);
+        // Klient widzi tylko swoje urządzenia
+        if (user?.uid) {
+          data = await getClientDevices(user.uid);
+        }
       }
       setDevices(data);
+      
+      // Pobierz liczniki napraw dla każdego urządzenia
+      const counts = {};
+      for (const device of data) {
+        try {
+          const history = await getDeviceRepairHistory(device.id);
+          counts[device.id] = history.length;
+        } catch (err) {
+          console.warn(`Could not fetch repair history for device ${device.id}:`, err);
+          counts[device.id] = device.repairHistory?.length || 0;
+        }
+      }
+      setRepairCounts(counts);
+      
       console.log('✅ Devices loaded:', data.length);
     } catch (error) {
       console.error('Error loading devices:', error);
@@ -32,13 +51,6 @@ export const DevicesListPage = () => {
     }
   };
 
-  const getWarrantyBadge = (status) => {
-    if (status === 'active') {
-      return <span className="warranty-badge active">✅ Gwarancja aktywna</span>;
-    } else {
-      return <span className="warranty-badge expired">❌ Gwarancja wygasła</span>;
-    }
-  };
 
   return (
     <div className="devices-list-container">
@@ -63,7 +75,6 @@ export const DevicesListPage = () => {
                 <h3>
                   {device.brand} {device.model}
                 </h3>
-                {getWarrantyBadge(device.warrantyStatus)}
               </div>
 
               <div className="device-info">
@@ -73,14 +84,8 @@ export const DevicesListPage = () => {
                 <p>
                   <strong>Rok produkcji:</strong> {device.yearProduction || 'Brak'}
                 </p>
-                {device.warrantyExpireDate && (
-                  <p>
-                    <strong>Gwarancja do:</strong>{' '}
-                    {new Date(device.warrantyExpireDate).toLocaleDateString('pl-PL')}
-                  </p>
-                )}
                 <p>
-                  <strong>Naprawy:</strong> {device.repairHistory?.length || 0}
+                  <strong>Naprawy:</strong> {repairCounts[device.id] !== undefined ? repairCounts[device.id] : (device.repairHistory?.length || 0)}
                 </p>
               </div>
 

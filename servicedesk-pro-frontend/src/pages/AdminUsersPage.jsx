@@ -10,6 +10,7 @@ import {
   activateUser,
   deleteUser,
   createUserProfile,
+  createUserWithAccount,
 } from '../services/userService';
 import '../styles/admin-users.css';
 
@@ -26,6 +27,7 @@ export const AdminUsersPage = () => {
     email: '',
     phone: '',
     role: 'client',
+    password: '',
   });
 
   useEffect(() => {
@@ -116,19 +118,47 @@ export const AdminUsersPage = () => {
     }
 
     try {
-      // Tworzy profil użytkownika bez authentication
-      const newUserId = await createUserProfile({
-        fullName: newUserData.fullName,
-        email: newUserData.email,
-        phone: newUserData.phone,
-        role: newUserData.role,
-        createdBy: user.uid,
-      });
+      // Dla worker, technician, manager - wymagane jest konto z hasłem
+      const rolesRequiringAccount = ['worker', 'technician', 'manager'];
+      const requiresAccount = rolesRequiringAccount.includes(newUserData.role);
 
-      setNewUserData({ fullName: '', email: '', phone: '', role: 'client' });
-      setShowNewUserForm(false);
-      await fetchUsers();
-      alert('✅ Użytkownik dodany (bez hasła)');
+      if (requiresAccount) {
+        if (!newUserData.password || newUserData.password.length < 6) {
+          alert('Dla tej roli wymagane jest hasło (min. 6 znaków)');
+          return;
+        }
+
+        // Utwórz użytkownika z kontem authentication
+        const newUserId = await createUserWithAccount(
+          {
+            fullName: newUserData.fullName,
+            email: newUserData.email,
+            phone: newUserData.phone,
+            role: newUserData.role,
+            createdBy: user.uid,
+          },
+          newUserData.password
+        );
+
+        setNewUserData({ fullName: '', email: '', phone: '', role: 'client', password: '' });
+        setShowNewUserForm(false);
+        await fetchUsers();
+        alert('✅ Użytkownik dodany z kontem do logowania');
+      } else {
+        // Dla klienta - tylko profil bez konta
+        const newUserId = await createUserProfile({
+          fullName: newUserData.fullName,
+          email: newUserData.email,
+          phone: newUserData.phone,
+          role: newUserData.role,
+          createdBy: user.uid,
+        });
+
+        setNewUserData({ fullName: '', email: '', phone: '', role: 'client', password: '' });
+        setShowNewUserForm(false);
+        await fetchUsers();
+        alert('✅ Użytkownik dodany (bez hasła - klient)');
+      }
     } catch (error) {
       alert('❌ Błąd: ' + error.message);
     }
@@ -212,6 +242,22 @@ export const AdminUsersPage = () => {
               </select>
             </div>
 
+            {(newUserData.role === 'worker' || newUserData.role === 'technician' || newUserData.role === 'manager') && (
+              <div className="form-group">
+                <label>Hasło (wymagane dla tej roli):</label>
+                <input
+                  type="password"
+                  value={newUserData.password}
+                  onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
+                  placeholder="Min. 6 znaków"
+                  required
+                />
+                <small style={{ color: '#999' }}>
+                  Dla pracownika, technika i menedżera wymagane jest hasło do logowania
+                </small>
+              </div>
+            )}
+
             <div className="form-actions">
               <button onClick={handleAddUser} className="btn-save">
                 ✓ Dodaj
@@ -221,8 +267,8 @@ export const AdminUsersPage = () => {
               </button>
             </div>
             <small style={{ color: '#999', marginTop: '10px', display: 'block' }}>
-              ℹ️ Użytkownik NIE będzie miał hasła. Użytkownik musi samodzielnie się zarejestrować
-              lub admin poda mu dane dostępowe.
+              ℹ️ Dla klienta: tylko profil bez hasła. Dla pracownika/technika/menedżera: wymagane
+              hasło do logowania.
             </small>
           </div>
         </div>

@@ -49,6 +49,42 @@ export const getUserDetails = async (userId) => {
   }
 };
 
+// Utwórz użytkownika z kontem authentication (dla worker, technician, manager)
+export const createUserWithAccount = async (userData, password) => {
+  try {
+    const { createUserWithEmailAndPassword } = await import('firebase/auth');
+    const { auth } = await import('../config/firebase');
+
+    if (!userData.email || !password) {
+      throw new Error('Email i hasło są wymagane do utworzenia konta');
+    }
+
+    // Utwórz konto authentication
+    const userCredential = await createUserWithEmailAndPassword(auth, userData.email, password);
+    const newUser = userCredential.user;
+
+    // Utwórz profil w Firestore
+    const userRef = doc(db, 'users', newUser.uid);
+    await setDoc(userRef, {
+      uid: newUser.uid,
+      email: userData.email,
+      fullName: userData.fullName,
+      role: userData.role || 'client',
+      phone: userData.phone || '',
+      createdAt: new Date().toISOString(),
+      createdBy: userData.createdBy,
+      hasAccount: true,
+      active: true,
+    });
+
+    console.log('✅ User with account created:', newUser.uid);
+    return newUser.uid;
+  } catch (error) {
+    console.error('Error creating user with account:', error);
+    throw error;
+  }
+};
+
 // Utwórz użytkownika (tylko dane kontaktowe, bez authentication)
 export const createUserProfile = async (userData) => {
   try {
@@ -65,6 +101,7 @@ export const createUserProfile = async (userData) => {
       createdAt: new Date().toISOString(),
       createdBy: userData.createdBy, // UID Worker'a
       hasAccount: false, // Nie ma konta authentication
+      active: true,
     });
 
     console.log('✅ User profile created:', userId);
