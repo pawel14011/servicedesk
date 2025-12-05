@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -7,6 +7,7 @@ import {
   assignTicketToTechnician,
 } from '../services/ticketService';
 import { uploadImage } from '../services/storageService';
+import { getClientDevices, createDevice } from '../services/deviceService';
 import { Navbar } from '../components/Navbar';
 import '../styles/ticket-form.css';
 import '../styles/dashboard.css';
@@ -18,9 +19,11 @@ export const CreateTicketPage = () => {
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [clientDevices, setClientDevices] = useState([]);
 
   const [formData, setFormData] = useState({
     description: '',
+    deviceId: '', // 'new' lub ID urządzenia
     deviceBrand: '',
     deviceModel: '',
     deviceSerialNumber: '',
@@ -28,12 +31,60 @@ export const CreateTicketPage = () => {
     preferredDeliveryDate: '',
   });
 
+  // Pobierz urządzenia klienta przy załadowaniu
+  useEffect(() => {
+    if (user?.uid) {
+      fetchClientDevices();
+    }
+  }, [user]);
+
+  const fetchClientDevices = async () => {
+    try {
+      const devices = await getClientDevices(user.uid);
+      setClientDevices(devices);
+      console.log('✅ Loaded client devices:', devices.length);
+      
+      // Jeśli nie ma urządzeń, automatycznie ustaw tryb "dodaj nowe"
+      if (devices.length === 0) {
+        setFormData((prev) => ({
+          ...prev,
+          deviceId: 'new',
+        }));
+      }
+    } catch (err) {
+      console.error('Error loading devices:', err);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Jeśli wybrano urządzenie z listy, wypełnij formularz danymi urządzenia
+    if (name === 'deviceId' && value !== 'new' && value !== '') {
+      const selectedDevice = clientDevices.find((d) => d.id === value);
+      if (selectedDevice) {
+        setFormData((prev) => ({
+          ...prev,
+          deviceBrand: selectedDevice.brand || '',
+          deviceModel: selectedDevice.model || '',
+          deviceSerialNumber: selectedDevice.serialNumber || '',
+          deviceYear: selectedDevice.yearProduction || new Date().getFullYear(),
+        }));
+      }
+    } else if (name === 'deviceId' && value === 'new') {
+      // Jeśli wybrano "Dodaj nowe", wyczyść pola
+      setFormData((prev) => ({
+        ...prev,
+        deviceBrand: '',
+        deviceModel: '',
+        deviceSerialNumber: '',
+        deviceYear: new Date().getFullYear(),
+      }));
+    }
   };
 
   const handleImageSelect = (e) => {
@@ -79,21 +130,33 @@ export const CreateTicketPage = () => {
     }
 
     try {
-      // 1. Sprawdź czy urządzenie istnieje lub utwórz nowe
-      let deviceId = null;
-      if (formData.deviceSerialNumber) {
-        const { findOrCreateDeviceBySerial } = await import('../services/deviceService');
-        deviceId = await findOrCreateDeviceBySerial(
-          formData.deviceSerialNumber,
-          {
-            brand: formData.deviceBrand,
-            model: formData.deviceModel,
-            yearProduction: parseInt(formData.deviceYear),
-            ownerId: user.uid,
-          },
-          user.uid
-        );
+      // 1. Jeśli urządzenie to "new" lub nie ma urządzeń — utwórz nowe
+      let deviceId = formData.deviceId;
+      if (formData.deviceId === 'new' || clientDevices.length === 0) {
+        if (!formData.deviceBrand || !formData.deviceModel) {
+          setError('Podaj markę i model urządzenia');
+          setLoading(false);
+          return;
+        }
+        deviceId = await createDevice({
+          brand: formData.deviceBrand,
+          model: formData.deviceModel,
+          serialNumber: formData.deviceSerialNumber,
+          yearProduction: parseInt(formData.deviceYear),
+          ownerId: user.uid,
+        });
+        console.log('✅ New device created:', deviceId);
       }
+
+      // Jeśli nie wybrano urządzenia i nie utworzono nowego
+      if (!deviceId || deviceId === '') {
+        setError('Wybierz urządzenie lub dodaj nowe');
+        setLoading(false);
+        return;
+      }
+
+      // Pobierz dane wybranego urządzenia
+      const selectedDevice = clientDevices.find((d) => d.id === deviceId);
 
       // 2. Tworzymy ticket
       const ticketId = await createTicket({
@@ -101,10 +164,10 @@ export const CreateTicketPage = () => {
         deviceId: deviceId,
         description: formData.description,
         device: {
-          brand: formData.deviceBrand,
-          model: formData.deviceModel,
-          serialNumber: formData.deviceSerialNumber,
-          year: parseInt(formData.deviceYear),
+          brand: formData.deviceBrand || selectedDevice?.brand,
+          model: formData.deviceModel || selectedDevice?.model,
+          serialNumber: formData.deviceSerialNumber || selectedDevice?.serialNumber,
+          year: parseInt(formData.deviceYear) || selectedDevice?.yearProduction,
         },
         preferredDeliveryDate: formData.preferredDeliveryDate || null,
         images: [], // Zainicjalizuj pustą tablicę
@@ -165,54 +228,93 @@ export const CreateTicketPage = () => {
         <div className="form-section">
           <h3>Dane urządzenia</h3>
 
-          <div className="form-group">
-            <label>Marka:</label>
-            <input
-              type="text"
-              name="deviceBrand"
-              value={formData.deviceBrand}
-              onChange={handleChange}
-              placeholder="np. Dell, Apple, HP"
-            />
-          </div>
+          {clientDevices.length > 0 && (
+            <div className="form-group">
+              <label>Wybierz urządzenie:</label>
+              <select
+                name="deviceId"
+                value={formData.deviceId}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Wybierz urządzenie --</option>
+                {clientDevices.map((device) => (
+                  <option key={device.id} value={device.id}>
+                    {device.brand} {device.model}
+                    {device.serialNumber ? ` (SN: ${device.serialNumber})` : ''}
+                  </option>
+                ))}
+                <option value="new">➕ Dodaj nowe urządzenie</option>
+              </select>
+            </div>
+          )}
 
-          <div className="form-group">
-            <label>Model:</label>
-            <input
-              type="text"
-              name="deviceModel"
-              value={formData.deviceModel}
-              onChange={handleChange}
-              placeholder="np. XPS 13, MacBook Pro"
-            />
-          </div>
+          {/* Jeśli wybrano "Dodaj nowe urządzenie" lub nie ma żadnych urządzeń */}
+          {(formData.deviceId === 'new' || clientDevices.length === 0) && (
+            <div
+              style={{
+                marginTop: clientDevices.length > 0 ? '15px' : '0',
+                background: clientDevices.length > 0 ? '#fff3e0' : 'transparent',
+                padding: clientDevices.length > 0 ? '15px' : '0',
+                borderRadius: clientDevices.length > 0 ? '5px' : '0',
+              }}
+            >
+              {clientDevices.length > 0 && (
+                <h4 style={{ margin: '0 0 10px 0', color: '#FF9800' }}>Dane nowego urządzenia:</h4>
+              )}
 
-          <div className="form-group">
-            <label>Numer seryjny (opcjonalnie):</label>
-            <input
-              type="text"
-              name="deviceSerialNumber"
-              value={formData.deviceSerialNumber}
-              onChange={handleChange}
-              placeholder="np. SN-12345678"
-            />
-          </div>
+              <div className="form-group">
+                <label>Marka:</label>
+                <input
+                  type="text"
+                  name="deviceBrand"
+                  value={formData.deviceBrand}
+                  onChange={handleChange}
+                  placeholder="np. Dell, Apple, HP"
+                  required={formData.deviceId === 'new' || clientDevices.length === 0}
+                />
+              </div>
 
-          <div className="form-group">
-            <label>Rok produkcji:</label>
-            <input
-              type="number"
-              name="deviceYear"
-              value={formData.deviceYear}
-              onChange={handleChange}
-              min="2000"
-              max={new Date().getFullYear()}
-              required
-            />
-            {formData.deviceYear < 2000 && (
-              <small style={{ color: 'red' }}>Rok produkcji nie może być starszy niż 2000</small>
-            )}
-          </div>
+              <div className="form-group">
+                <label>Model:</label>
+                <input
+                  type="text"
+                  name="deviceModel"
+                  value={formData.deviceModel}
+                  onChange={handleChange}
+                  placeholder="np. XPS 13, MacBook Pro"
+                  required={formData.deviceId === 'new' || clientDevices.length === 0}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Numer seryjny (opcjonalnie):</label>
+                <input
+                  type="text"
+                  name="deviceSerialNumber"
+                  value={formData.deviceSerialNumber}
+                  onChange={handleChange}
+                  placeholder="np. SN-12345678"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Rok produkcji:</label>
+                <input
+                  type="number"
+                  name="deviceYear"
+                  value={formData.deviceYear}
+                  onChange={handleChange}
+                  min="2000"
+                  max={new Date().getFullYear()}
+                  required={formData.deviceId === 'new' || clientDevices.length === 0}
+                />
+                {formData.deviceYear < 2000 && (
+                  <small style={{ color: 'red' }}>Rok produkcji nie może być starszy niż 2000</small>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ============= NOWA SEKCJA: ZDJĘCIE ============= */}
